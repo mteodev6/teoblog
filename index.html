@@ -5,6 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TeoDev's Cyber Zone!!</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* CSS animations to replace external GIFs */
+        .fire { display: inline-block; animation: flicker 0.3s infinite alternate; font-size: 3rem; vertical-align: middle; }
+        @keyframes flicker { 0% { transform: scale(1) rotate(-5deg); opacity: 0.8; } 100% { transform: scale(1.1) rotate(5deg); opacity: 1; } }
+        
+        .spin { display: inline-block; animation: spin-anim 2s linear infinite; font-size: 3rem; }
+        @keyframes spin-anim { 100% { transform: rotate(360deg); } }
+
+        /* CSS Recreations of classic 88x31 Web Badges */
+        .retro-badge {
+            display: inline-block;
+            width: 88px;
+            height: 31px;
+            border: 2px outset #ffffff;
+            font-family: "MS Sans Serif", Arial, sans-serif;
+            font-size: 9px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 12px;
+            margin: 0 5px;
+            cursor: pointer;
+            box-sizing: border-box;
+            padding-top: 2px;
+        }
+        .badge-ie { background: #000080; color: #ffffff; }
+        .badge-ie span { color: #00ffff; font-size: 14px; vertical-align: middle; }
+        .badge-ns { background: #008080; color: #ffffff; }
+        .badge-np { background: #ffffff; color: #000000; border-color: #808080; }
+        .badge-np span { color: #ff0000; }
+    </style>
 </head>
 <body>
 
@@ -17,9 +47,9 @@
     <div class="container">
         <header>
             <h1>
-                <img src="https://web.archive.org/web/20090829012411/http://geocities.com/SiliconValley/Lakes/4929/flames.gif" alt="flames">
+                <span class="fire">🔥</span>
                 TEODEV'S ZONE
-                <img src="https://web.archive.org/web/20090829012411/http://geocities.com/SiliconValley/Lakes/4929/flames.gif" alt="flames">
+                <span class="fire">🔥</span>
             </h1>
             <p class="blink">/// SURF THE WEB ///</p>
             <hr>
@@ -29,18 +59,22 @@
             <div class="post-card">
                 <center>
                     <h2 class="blink">LOADING DATA...</h2>
-                    <img src="https://web.archive.org/web/20090808061329/http://hk.geocities.com/yolanda_2222000/underconstruction.gif" alt="Under Construction">
+                    <span class="spin">🚧</span>
+                    <p><b>SITE UNDER CONSTRUCTION</b></p>
                 </center>
             </div>
         </main>
 
         <div class="web-buttons">
             <p><b>You are visitor number:</b></p>
-            <img src="https://counter.joeyk.dev/counter.svg?name=teodev1998&theme=asoul" alt="Hit Counter"><br><br>
+            <div style="background: black; color: red; display: inline-block; padding: 2px 10px; font-family: monospace; font-size: 1.2rem; border: 2px inset gray; letter-spacing: 3px;">
+                001337
+            </div>
+            <br><br>
             
-            <img src="https://web.archive.org/web/20091026210052/http://geocities.com/brian42571/ie_anim.gif" alt="Get IE">
-            <img src="https://web.archive.org/web/20091027083020/http://geocities.com/SiliconValley/Way/4166/netscape.gif" alt="Netscape Now">
-            <img src="https://web.archive.org/web/20090829071428/http://geocities.com/Heartland/Valley/2651/notepad.gif" alt="Made with Notepad">
+            <div class="retro-badge badge-ie"><span>e</span> GET<br>INTERNET EXPLORER</div>
+            <div class="retro-badge badge-ns">NETSCAPE<br>N O W !</div>
+            <div class="retro-badge badge-np">MADE WITH<br><span>NOTEPAD</span></div>
         </div>
     </div>
 
@@ -100,7 +134,6 @@
                         <center><a onclick="openFullPost(this)" data-id="${doc.id}">Click here to read more...</a></center>
                     `;
 
-                    // Sneaky way to pass data without breaking the HTML string
                     card.querySelector('a').onclick = () => openFullPost(data);
                     feedContainer.appendChild(card);
                 });
