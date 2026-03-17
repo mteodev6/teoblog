@@ -5,36 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TeoDev's Cyber Zone!!</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* CSS animations to replace external GIFs */
-        .fire { display: inline-block; animation: flicker 0.3s infinite alternate; font-size: 3rem; vertical-align: middle; }
-        @keyframes flicker { 0% { transform: scale(1) rotate(-5deg); opacity: 0.8; } 100% { transform: scale(1.1) rotate(5deg); opacity: 1; } }
-        
-        .spin { display: inline-block; animation: spin-anim 2s linear infinite; font-size: 3rem; }
-        @keyframes spin-anim { 100% { transform: rotate(360deg); } }
-
-        /* CSS Recreations of classic 88x31 Web Badges */
-        .retro-badge {
-            display: inline-block;
-            width: 88px;
-            height: 31px;
-            border: 2px outset #ffffff;
-            font-family: "MS Sans Serif", Arial, sans-serif;
-            font-size: 9px;
-            font-weight: bold;
-            text-align: center;
-            line-height: 12px;
-            margin: 0 5px;
-            cursor: pointer;
-            box-sizing: border-box;
-            padding-top: 2px;
-        }
-        .badge-ie { background: #000080; color: #ffffff; }
-        .badge-ie span { color: #00ffff; font-size: 14px; vertical-align: middle; }
-        .badge-ns { background: #008080; color: #ffffff; }
-        .badge-np { background: #ffffff; color: #000000; border-color: #808080; }
-        .badge-np span { color: #ff0000; }
-    </style>
 </head>
 <body>
 
@@ -47,9 +17,9 @@
     <div class="container">
         <header>
             <h1>
-                <span class="fire">🔥</span>
+                <img src="assets/fire.gif" alt="flames" align="middle">
                 TEODEV'S ZONE
-                <span class="fire">🔥</span>
+                <img src="assets/fire.gif" alt="flames" align="middle">
             </h1>
             <p class="blink">/// SURF THE WEB ///</p>
             <hr>
@@ -59,7 +29,7 @@
             <div class="post-card">
                 <center>
                     <h2 class="blink">LOADING DATA...</h2>
-                    <span class="spin">🚧</span>
+                    <img src="assets/construction.gif" alt="Under Construction">
                     <p><b>SITE UNDER CONSTRUCTION</b></p>
                 </center>
             </div>
@@ -67,14 +37,12 @@
 
         <div class="web-buttons">
             <p><b>You are visitor number:</b></p>
-            <div style="background: black; color: red; display: inline-block; padding: 2px 10px; font-family: monospace; font-size: 1.2rem; border: 2px inset gray; letter-spacing: 3px;">
-                001337
-            </div>
+            <img src="assets/counter.gif" alt="Hit Counter">
             <br><br>
             
-            <div class="retro-badge badge-ie"><span>e</span> GET<br>INTERNET EXPLORER</div>
-            <div class="retro-badge badge-ns">NETSCAPE<br>N O W !</div>
-            <div class="retro-badge badge-np">MADE WITH<br><span>NOTEPAD</span></div>
+            <img src="assets/ie.gif" alt="Get IE" border="0">
+            <img src="assets/netscape.gif" alt="Netscape Now" border="0">
+            <img src="assets/notepad.gif" alt="Made with Notepad" border="0">
         </div>
     </div>
 
