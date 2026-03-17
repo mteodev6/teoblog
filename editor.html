@@ -185,35 +185,41 @@
             theme: 'snow'
         });
 
-        // ==========================================
-        // 4. AUTO-SAVE (DRAFT) LOGIC
+       // ==========================================
+        // 4. AUTO-SAVE (DRAFT) LOGIC (UPDATED)
         // ==========================================
         const titleInput = document.getElementById('post-title');
         const statusText = document.getElementById('save-status');
 
-        // Load draft when the page opens
-        window.onload = () => {
+        // 1. Instantly load draft (No window.onload needed)
+        try {
             const savedTitle = localStorage.getItem('teodev_draft_title');
             const savedContent = localStorage.getItem('teodev_draft_content');
             
             if (savedTitle) titleInput.value = savedTitle;
             if (savedContent) quill.root.innerHTML = savedContent;
             if (savedTitle || savedContent) statusText.innerText = "Draft loaded from local memory.";
-        };
+        } catch (e) {
+            statusText.innerText = "Local memory blocked (Incognito?)";
+        }
 
-        // Save title as you type
+        // 2. Save title as you type
         titleInput.addEventListener('input', () => {
-            localStorage.setItem('teodev_draft_title', titleInput.value);
-            statusText.innerText = "Auto-saved at " + new Date().toLocaleTimeString();
+            try {
+                localStorage.setItem('teodev_draft_title', titleInput.value);
+                statusText.innerText = "Auto-saved at " + new Date().toLocaleTimeString();
+            } catch (e) {}
         });
 
-        // Save content as you type
+        // 3. Save content as you type
         quill.on('text-change', () => {
-            localStorage.setItem('teodev_draft_content', quill.root.innerHTML);
-            statusText.innerText = "Auto-saved at " + new Date().toLocaleTimeString();
+            try {
+                localStorage.setItem('teodev_draft_content', quill.root.innerHTML);
+                statusText.innerText = "Auto-saved at " + new Date().toLocaleTimeString();
+            } catch (e) {}
         });
 
-        // Wipe Draft Button
+        // 4. Wipe Draft Button
         document.getElementById('clear-btn').addEventListener('click', () => {
             if(confirm("CRITICAL: Wipe current draft from local memory?")) {
                 localStorage.removeItem('teodev_draft_title');
@@ -223,7 +229,7 @@
                 statusText.innerText = "Draft memory wiped.";
             }
         });
-
+        
         // ==========================================
         // 5. TRANSMISSION LOGIC
         // ==========================================
