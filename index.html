@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeoDev // Night City</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="bg-glow glow-purple"></div>
+    <div class="bg-glow glow-blue"></div>
+
+    <div class="container">
+        <header>
+            <h1 class="neon-text">TEODEV<span class="cursor">_</span></h1>
+            <p class="subtitle">// Digital Archive .01</p>
+        </header>
+
+        <div class="layout-grid">
+            <aside>
+                <h2>Post Log</h2>
+                <nav id="post-menu">
+                    <p class="loading">Scanning...</p>
+                </nav>
+            </aside>
+
+            <main>
+                <div class="glass-panel">
+                    <article id="blog-content">
+                        <p class="loading">Awaiting signal...</p>
+                    </article>
+
+                    <div class="interaction-zone">
+                        <div class="actions">
+                            <button id="like-btn">♥ Like</button>
+                            <button onclick="document.getElementById('comment-section').classList.toggle('hidden')">💬 Comment</button>
+                        </div>
+                        <div id="comment-section" class="hidden">
+                            <textarea id="comment-input" placeholder="Initiate text sequence..."></textarea>
+                            <button class="submit-btn" id="submit-comment">Transmit</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "your-project.firebaseapp.com",
+            projectId: "your-project",
+            storageBucket: "your-project.appspot.com",
+            messagingSenderId: "123456",
+            appId: "1:123456:web:abcdef"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const menuContainer = document.getElementById('post-menu');
+        const contentContainer = document.getElementById('blog-content');
+
+        async function loadAllPosts() {
+            menuContainer.innerHTML = '';
+            try {
+                const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    menuContainer.innerHTML = '<p class="loading">No logs found.</p>';
+                    contentContainer.innerHTML = '<h1>Welcome</h1><p>No posts found in the database.</p>';
+                    return;
+                }
+
+                querySnapshot.forEach((doc, index) => {
+                    const data = doc.data();
+                    const btn = document.createElement('button');
+                    btn.className = "menu-btn";
+                    btn.innerText = `> ${data.title}`;
+                    btn.onclick = () => {
+                        contentContainer.innerHTML = data.content;
+                        window.scrollTo({top: 0, behavior: 'smooth'});
+                    };
+                    menuContainer.appendChild(btn);
+
+                    if (index === 0) contentContainer.innerHTML = data.content;
+                });
+            } catch (err) {
+                contentContainer.innerHTML = '<p class="error">Connection failed.</p>';
+            }
+        }
+        loadAllPosts();
+    </script>
+</body>
+</html>
