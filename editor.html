@@ -185,50 +185,64 @@
             theme: 'snow'
         });
 
-       // ==========================================
-        // 4. AUTO-SAVE (DRAFT) LOGIC (UPDATED)
-        // ==========================================
-        const titleInput = document.getElementById('post-title');
-        const statusText = document.getElementById('save-status');
+      // ==========================================
+// 4. AUTO-SAVE (DRAFT) LOGIC (FIXED)
+// ==========================================
+const titleInput = document.getElementById('post-title');
+const statusText = document.getElementById('save-status');
 
-        // 1. Instantly load draft (No window.onload needed)
-        try {
-            const savedTitle = localStorage.getItem('teodev_draft_title');
-            const savedContent = localStorage.getItem('teodev_draft_content');
-            
-            if (savedTitle) titleInput.value = savedTitle;
-            if (savedContent) quill.root.innerHTML = savedContent;
-            if (savedTitle || savedContent) statusText.innerText = "Draft loaded from local memory.";
-        } catch (e) {
-            statusText.innerText = "Local memory blocked (Incognito?)";
+// 1. Load draft AFTER Quill is fully ready
+setTimeout(() => {
+    try {
+        const savedTitle = localStorage.getItem('teodev_draft_title');
+        const savedContent = localStorage.getItem('teodev_draft_content');
+
+        if (savedTitle) {
+            titleInput.value = savedTitle;
         }
+        if (savedContent) {
+            quill.clipboard.dangerouslyPasteHTML(savedContent); // ✅ Fixed: use Quill's own method
+        }
+        if (savedTitle || savedContent) {
+            statusText.innerText = "✅ Draft restored from local memory.";
+        } else {
+            statusText.innerText = "Draft Status: No saved draft found.";
+        }
+    } catch (e) {
+        statusText.innerText = "⚠️ Local memory blocked (Incognito mode?)";
+    }
+}, 100); // Small delay ensures Quill is fully mounted before we paste
 
-        // 2. Save title as you type
-        titleInput.addEventListener('input', () => {
-            try {
-                localStorage.setItem('teodev_draft_title', titleInput.value);
-                statusText.innerText = "Auto-saved at " + new Date().toLocaleTimeString();
-            } catch (e) {}
-        });
+// 2. Save title as you type
+titleInput.addEventListener('input', () => {
+    try {
+        localStorage.setItem('teodev_draft_title', titleInput.value);
+        statusText.innerText = "💾 Auto-saved at " + new Date().toLocaleTimeString();
+    } catch (e) {
+        statusText.innerText = "⚠️ Could not save draft.";
+    }
+});
 
-        // 3. Save content as you type
-        quill.on('text-change', () => {
-            try {
-                localStorage.setItem('teodev_draft_content', quill.root.innerHTML);
-                statusText.innerText = "Auto-saved at " + new Date().toLocaleTimeString();
-            } catch (e) {}
-        });
+// 3. Save content as you type
+quill.on('text-change', () => {
+    try {
+        localStorage.setItem('teodev_draft_content', quill.root.innerHTML);
+        statusText.innerText = "💾 Auto-saved at " + new Date().toLocaleTimeString();
+    } catch (e) {
+        statusText.innerText = "⚠️ Could not save draft.";
+    }
+});
 
-        // 4. Wipe Draft Button
-        document.getElementById('clear-btn').addEventListener('click', () => {
-            if(confirm("CRITICAL: Wipe current draft from local memory?")) {
-                localStorage.removeItem('teodev_draft_title');
-                localStorage.removeItem('teodev_draft_content');
-                titleInput.value = '';
-                quill.root.innerHTML = '';
-                statusText.innerText = "Draft memory wiped.";
-            }
-        });
+// 4. Wipe Draft Button
+document.getElementById('clear-btn').addEventListener('click', () => {
+    if (confirm("CRITICAL: Wipe current draft from local memory?")) {
+        localStorage.removeItem('teodev_draft_title');
+        localStorage.removeItem('teodev_draft_content');
+        titleInput.value = '';
+        quill.setContents([]); // ✅ Fixed: properly clears Quill instead of setting innerHTML
+        statusText.innerText = "🗑️ Draft memory wiped.";
+    }
+});
         
         // ==========================================
         // 5. TRANSMISSION LOGIC
