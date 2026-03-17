@@ -21,6 +21,19 @@
             <div id="loading-state" class="glass-panel">
                 <p class="loading">Establishing link to database...</p>
             </div>
+            <div class="glass-panel" id="public-log-section" style="margin-top: 3rem; border-color: var(--neon-blue);">
+            <h2 style="color: var(--neon-blue); font-family: monospace; margin-bottom: 0;">> PUBLIC_LOG</h2>
+            <p style="font-size: 0.8rem; color: var(--text-muted); font-family: monospace; margin-bottom: 1rem;">Leave a trace in the system (Max 100 chars).</p>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 1rem;">
+                <input type="text" id="guest-input" maxlength="100" placeholder="Enter transmission..." style="flex-grow: 1; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-blue); color: white; padding: 10px; border-radius: 4px; font-family: monospace;">
+                <button id="guest-submit" class="btn-neon" style="border-color: var(--neon-blue); color: var(--neon-blue);">SEND</button>
+            </div>
+
+            <div id="guest-messages" style="max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.85rem; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 4px; border: 1px solid rgba(59, 130, 246, 0.2);">
+                <p class="loading" style="color: var(--neon-blue);">Scanning for traces...</p>
+            </div>
+        </div>
         </main>
 
         <footer>
