@@ -3,28 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEODEV_OS // v1.0</title>
+    <title>TeoDev's Cyber Zone!!</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <center>
+        <marquee scrollamount="8" width="80%" bgcolor="#FF0000">
+            <font size="5" color="#FFFFFF"><b>*** WELCOME TO TEODEV'S HOMEPAGE *** UPDATED DAILY *** SIGN MY GUESTBOOK ***</b></font>
+        </marquee>
+    </center>
+
     <div class="container">
         <header>
-            <h1 class="terminal-prompt" onclick="location.reload()" style="cursor:pointer">
-                C:\TEODEV><span class="cursor"></span>
+            <h1>
+                <img src="https://web.archive.org/web/20090829012411/http://geocities.com/SiliconValley/Lakes/4929/flames.gif" alt="flames">
+                TEODEV'S ZONE
+                <img src="https://web.archive.org/web/20090829012411/http://geocities.com/SiliconValley/Lakes/4929/flames.gif" alt="flames">
             </h1>
-            <p class="subtitle">SYSTEM BOOT SUCCESSFUL. ARCHIVE ACCESSIBLE.</p>
+            <p class="blink">/// SURF THE WEB ///</p>
+            <hr>
         </header>
 
         <main id="main-feed">
-            <div id="loading-state" class="terminal-panel">
-                <p class="loading">C:\> DIR /S /B ... FETCHING DATA</p>
+            <div class="post-card">
+                <center>
+                    <h2 class="blink">LOADING DATA...</h2>
+                    <img src="https://web.archive.org/web/20090808061329/http://hk.geocities.com/yolanda_2222000/underconstruction.gif" alt="Under Construction">
+                </center>
             </div>
         </main>
 
-        <footer>
-            EOF // SYSTEM STANDBY
-        </footer>
+        <div class="web-buttons">
+            <p><b>You are visitor number:</b></p>
+            <img src="https://counter.joeyk.dev/counter.svg?name=teodev1998&theme=asoul" alt="Hit Counter"><br><br>
+            
+            <img src="https://web.archive.org/web/20091026210052/http://geocities.com/brian42571/ie_anim.gif" alt="Get IE">
+            <img src="https://web.archive.org/web/20091027083020/http://geocities.com/SiliconValley/Way/4166/netscape.gif" alt="Netscape Now">
+            <img src="https://web.archive.org/web/20090829071428/http://geocities.com/Heartland/Valley/2651/notepad.gif" alt="Made with Notepad">
+        </div>
     </div>
 
     <script type="module">
@@ -35,7 +52,7 @@
         // 1. PASTE YOUR FIREBASE CONFIG HERE
         // ==========================================
         const firebaseConfig = {
-    apiKey: "AIzaSyB1d_gCT36RxrQcMQ2Dn7mbdszw4Z9XMQg",
+  apiKey: "AIzaSyB1d_gCT36RxrQcMQ2Dn7mbdszw4Z9XMQg",
   authDomain: "teodevblog.firebaseapp.com",
   projectId: "teodevblog",
   storageBucket: "teodevblog.firebasestorage.app",
@@ -58,7 +75,7 @@
                 const querySnapshot = await getDocs(q);
                 
                 if (querySnapshot.empty) {
-                    feedContainer.innerHTML = '<div class="terminal-panel"><h3>ERROR 404</h3><p>NO FILES FOUND ON DRIVE.</p></div>';
+                    feedContainer.innerHTML = '<div class="post-card"><center><h2>NO POSTS YET!</h2><p>Check back later.</p></center></div>';
                     return;
                 }
 
@@ -66,30 +83,31 @@
 
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
-                    const postDate = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString() : "DATE_UNKNOWN";
+                    const postDate = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString() : "Unknown Date";
                     
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = data.content;
                     const snippet = tempDiv.textContent.substring(0, 150) + "...";
 
                     const card = document.createElement('div');
-                    card.className = "terminal-panel post-card";
+                    card.className = "post-card";
                     card.innerHTML = `
                         <div class="post-header">
-                            <h2 class="post-title">FILE: ${data.title}</h2>
-                            <span class="post-date">[${postDate}]</span>
+                            <h2 class="post-title">${data.title}</h2>
+                            <span class="post-date">Posted on: ${postDate}</span>
                         </div>
                         <p class="post-snippet">${snippet}</p>
-                        <button class="read-more">C:\> TYPE FILE.TXT</button>
+                        <center><a onclick="openFullPost(this)" data-id="${doc.id}">Click here to read more...</a></center>
                     `;
 
-                    card.onclick = () => openFullPost(data);
+                    // Sneaky way to pass data without breaking the HTML string
+                    card.querySelector('a').onclick = () => openFullPost(data);
                     feedContainer.appendChild(card);
                 });
 
             } catch (err) {
                 console.error(err);
-                feedContainer.innerHTML = '<div class="terminal-panel"><p class="error">FATAL ERROR: CONNECTION LOST.</p></div>';
+                feedContainer.innerHTML = '<div class="post-card"><center><h2 style="color:red;">BROKEN LINK!</h2><p>Tell the webmaster.</p></center></div>';
             }
         }
 
@@ -97,21 +115,20 @@
             window.scrollTo({top: 0, behavior: 'smooth'});
             
             feedContainer.innerHTML = `
-                <div class="terminal-panel">
-                    <button class="back-btn" onclick="location.reload()">< CD ..</button>
-                    <h2>${data.title}</h2>
-                    <div style="border-bottom: 1px dashed var(--text-muted); margin-bottom: 1rem;"></div>
-                    
+                <div class="full-post-view">
+                    <a onclick="location.reload()"><< Back to Homepage</a>
+                    <hr>
+                    <h2 style="color: #0000FF; margin-bottom: 0;">${data.title}</h2>
+                    <br>
                     <div class="full-content">${data.content}</div>
-                    
-                    <div style="margin-top: 3rem; border-top: var(--border-style); padding-top: 1rem;">
-                        <button class="btn-retro" onclick="alert('ACKNOWLEDGED.')">UPVOTE_FILE</button>
-                    </div>
+                    <hr>
+                    <center>
+                        <a href="mailto:fake@email.com">Email the Author</a>
+                    </center>
                 </div>
             `;
         }
 
-        // Boot up system
         loadFeed();
     </script>
 </body>
