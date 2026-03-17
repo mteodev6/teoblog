@@ -8,13 +8,6 @@
 </head>
 <body>
 
-    <div class="user-profile" id="auth-status" title="Click to Login/Logout">
-        <span id="user-name">GUEST_USER</span>
-        <div class="profile-pic">
-            <img id="user-img" src="https://api.dicebear.com/7.x/bottts/svg?seed=Teo" alt="Profile">
-        </div>
-    </div>
-
     <div class="bg-glow glow-purple"></div>
     <div class="bg-glow glow-blue"></div>
 
@@ -38,7 +31,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         // ==========================================
         // 1. PASTE YOUR FIREBASE CONFIG HERE
@@ -56,39 +48,7 @@
         // Initialize Firebase Services
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
-
         const feedContainer = document.getElementById('main-feed');
-        const userName = document.getElementById('user-name');
-        const userImg = document.getElementById('user-img');
-        const authArea = document.getElementById('auth-status');
-
-        // --- AUTHENTICATION LOGIC ---
-        authArea.onclick = async () => {
-            if (!auth.currentUser) {
-                try {
-                    await signInWithPopup(auth, provider);
-                } catch (err) {
-                    console.error("Auth failed:", err);
-                }
-            } else {
-                if (confirm("Disconnect from Archive?")) {
-                    await signOut(auth);
-                    location.reload();
-                }
-            }
-        };
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                userName.innerText = user.displayName.split(' ')[0].toUpperCase();
-                userImg.src = user.photoURL;
-            } else {
-                userName.innerText = "GUEST_USER";
-                userImg.src = "https://api.dicebear.com/7.x/bottts/svg?seed=Teo";
-            }
-        });
 
         // --- BLOG DATA LOGIC ---
         async function loadFeed() {
