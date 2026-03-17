@@ -1,64 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TeoDev // Night City</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    // Added GoogleAuthProvider and signInWithPopup
+    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-    <div class="user-profile" id="auth-status">
-        <span id="user-name">GUEST_USER</span>
-        <div class="profile-pic">
-            <img id="user-img" src="https://api.dicebear.com/7.x/bottts/svg?seed=Teo" alt="Profile">
-        </div>
-    </div>
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "your-project.firebaseapp.com",
+        projectId: "your-project",
+        storageBucket: "your-project.appspot.com",
+        messagingSenderId: "123456",
+        appId: "1:123456:web:abcdef"
+    };
 
-    <div class="bg-glow glow-purple"></div>
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
-    <div class="container">
-        <header>
-            <h1 class="neon-text" onclick="location.reload()" style="cursor:pointer">TEODEV<span class="cursor">_</span></h1>
-            <p class="subtitle">// Digital Archive .01</p>
-        </header>
+    // --- AUTH LOGIC ---
+    const authArea = document.getElementById('auth-status');
+    const userName = document.getElementById('user-name');
+    const userImg = document.getElementById('user-img');
 
-        <main id="main-feed">
-            <div id="loading-state" class="glass-panel">
-                <p class="loading">Scanning database...</p>
-            </div>
-        </main>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-        // Auth import for later
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-
-        const firebaseConfig = {
-  apiKey: "AIzaSyB1d_gCT36RxrQcMQ2Dn7mbdszw4Z9XMQg",
-  authDomain: "teodevblog.firebaseapp.com",
-  projectId: "teodevblog",
-  storageBucket: "teodevblog.firebasestorage.app",
-  messagingSenderId: "209802069985",
-  appId: "1:209802069985:web:9382e0f47c210373f074a0",
-  measurementId: "G-JKE237HSTE"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        const feedContainer = document.getElementById('main-feed');
-
-        // Handle Auth UI Update
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('user-name').innerText = user.displayName || "ADMIN";
-                if (user.photoURL) document.getElementById('user-img').src = user.photoURL;
+    // Toggle Login/Logout
+    authArea.onclick = async () => {
+        if (!auth.currentUser) {
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (err) {
+                console.error("Auth failed:", err);
             }
-        });
+        } else {
+            if (confirm("Disconnect from Archive?")) {
+                await signOut(auth);
+                location.reload();
+            }
+        }
+    };
 
+    // Listen for Auth Changes
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            userName.innerText = user.displayName.toUpperCase();
+            userImg.src = user.photoURL;
+            console.log("Logged in as:", user.email);
+        } else {
+            userName.innerText = "GUEST_USER";
+            userImg.src = "https://api.dicebear.com/7.x/bottts/svg?seed=Teo";
+        }
+    });
+
+    // ... Keep the rest of your loadFeed() and openFullPost() functions ...
         async function loadFeed() {
             try {
                 const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
