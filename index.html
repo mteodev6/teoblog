@@ -12,43 +12,29 @@
     <div class="bg-glow glow-blue"></div>
 
     <div class="container">
-        <header style="text-align: center; margin-bottom: 4rem;">
-            <h1 class="neon-text">TEODEV<span class="cursor">_</span></h1>
+        <header>
+            <h1 class="neon-text" onclick="location.reload()" style="cursor:pointer">TEODEV<span class="cursor">_</span></h1>
             <p class="subtitle">// Digital Archive .01</p>
         </header>
 
-        <main style="max-width: 800px; margin: 0 auto;">
-            <div class="glass-panel">
-                <article id="blog-content">
-                    <p class="loading">Establishing link to database...</p>
-                </article>
-
-                <div class="interaction-zone">
-                    <div class="actions">
-                        <button id="like-btn" onclick="this.classList.toggle('active-like')">♥ Like</button>
-                        <button onclick="document.getElementById('comment-section').classList.toggle('hidden')">💬 Comment</button>
-                    </div>
-                    
-                    <div id="comment-section" class="hidden">
-                        <textarea id="comment-input" placeholder="Initiate text sequence..."></textarea>
-                        <button class="submit-btn" onclick="alert('Comment functionality pending backend link!')">Transmit</button>
-                    </div>
-                </div>
+        <main id="main-feed">
+            <div id="loading-state" class="glass-panel">
+                <p class="loading">Scanning database for active logs...</p>
             </div>
-
-            <footer style="margin-top: 4rem; text-align: center; opacity: 0.3; font-family: monospace; font-size: 0.7rem;">
-                [ END OF LOG // SYSTEM ONLINE ]
-            </footer>
         </main>
+
+        <footer style="margin-top: 4rem; text-align: center; opacity: 0.3; font-family: monospace; font-size: 0.7rem;">
+            [ END OF LOG // SYSTEM ONLINE ]
+        </footer>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // 1. PASTE YOUR REAL FIREBASE CONFIG HERE
         const firebaseConfig = {
- apiKey: "AIzaSyB1d_gCT36RxrQcMQ2Dn7mbdszw4Z9XMQg",
+  apiKey: "AIzaSyB1d_gCT36RxrQcMQ2Dn7mbdszw4Z9XMQg",
   authDomain: "teodevblog.firebaseapp.com",
   projectId: "teodevblog",
   storageBucket: "teodevblog.firebasestorage.app",
@@ -58,41 +44,71 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const contentContainer = document.getElementById('blog-content');
+        const feedContainer = document.getElementById('main-feed');
 
-        // 2. Automatically load the LATEST post
-        async function loadLatestPost() {
+        // 2. Load the Feed
+        async function loadFeed() {
             try {
-                // Fetch only the 1 most recent post
-                const q = query(collection(db, "posts"), orderBy("timestamp", "desc"), limit(1));
+                const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
                 const querySnapshot = await getDocs(q);
                 
                 if (querySnapshot.empty) {
-                    contentContainer.innerHTML = '<h1>System Empty</h1><p>No data found in the archive. Use the editor to transmit your first log.</p>';
+                    feedContainer.innerHTML = '<div class="glass-panel"><h1>Archive Empty</h1><p>No data found.</p></div>';
                     return;
                 }
 
-                // Inject the content immediately
+                feedContainer.innerHTML = ''; // Clear loading state
+
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
-                    // Wrap the content in a fade-in effect
-                    contentContainer.style.opacity = 0;
-                    contentContainer.innerHTML = `
-                        <h2 style="color:var(--neon-purple); font-family:monospace; margin-bottom:1rem;">> ${data.title}</h2>
-                        <div class="post-body">${data.content}</div>
+                    const postDate = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString() : "Pending...";
+                    
+                    // Create the Post Card
+                    const card = document.createElement('div');
+                    card.className = "glass-panel post-card";
+                    
+                    // Create a text snippet (removes HTML tags first)
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = data.content;
+                    const snippet = tempDiv.textContent.substring(0, 150) + "...";
+
+                    card.innerHTML = `
+                        <div class="post-header">
+                            <h2 class="post-title">> ${data.title}</h2>
+                            <span class="post-date">${postDate}</span>
+                        </div>
+                        <p class="post-snippet">${snippet}</p>
+                        <button class="read-more">OPEN_LOG</button>
                     `;
-                    // Smooth transition
-                    setTimeout(() => { contentContainer.style.transition = "opacity 0.5s"; contentContainer.style.opacity = 1; }, 50);
+
+                    // Click event to expand
+                    card.onclick = () => openFullPost(data);
+                    feedContainer.appendChild(card);
                 });
 
             } catch (err) {
                 console.error(err);
-                contentContainer.innerHTML = '<p class="error">CRITICAL_ERROR: Connection to Firestore refused.</p>';
+                feedContainer.innerHTML = '<div class="glass-panel"><p class="error">CRITICAL_ERROR: Database link severed.</p></div>';
             }
         }
 
-        // Run the function on page load
-        loadLatestPost();
+        // 3. Open Full Post View
+        function openFullPost(data) {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            feedContainer.innerHTML = `
+                <div class="glass-panel full-post-view">
+                    <button class="back-btn" onclick="location.reload()">[ BACK_TO_ARCHIVE ]</button>
+                    <h1 class="neon-text-small">${data.title}</h1>
+                    <div class="full-content">${data.content}</div>
+                    <div class="interaction-zone">
+                        <button class="action-btn active-like">♥ Like</button>
+                        <button class="action-btn">💬 Comment</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        loadFeed();
     </script>
 </body>
 </html>
