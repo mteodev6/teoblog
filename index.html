@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TeoDev // Night City</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Custom Neon Scrollbar for the Guestbook */
+        #guest-messages::-webkit-scrollbar { width: 6px; }
+        #guest-messages::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.3); border-radius: 4px; }
+        #guest-messages::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.4); border-radius: 4px; }
+        #guest-messages::-webkit-scrollbar-thumb:hover { background: var(--neon-blue); }
+    </style>
 </head>
 <body>
 
@@ -21,20 +28,21 @@
             <div id="loading-state" class="glass-panel">
                 <p class="loading">Establishing link to database...</p>
             </div>
-            <div class="glass-panel" id="public-log-section" style="margin-top: 3rem; border-color: var(--neon-blue);">
+        </main>
+
+        <div class="glass-panel" id="public-log-section" style="margin-top: 3rem; border-color: rgba(59, 130, 246, 0.4);">
             <h2 style="color: var(--neon-blue); font-family: monospace; margin-bottom: 0;">> PUBLIC_LOG</h2>
-            <p style="font-size: 0.8rem; color: var(--text-muted); font-family: monospace; margin-bottom: 1rem;">Leave a trace in the system (Max 100 chars).</p>
+            <p style="font-size: 0.8rem; color: var(--text-muted); font-family: monospace; margin-bottom: 1.5rem;">Leave a trace in the system (Max 100 chars).</p>
             
             <div style="display: flex; gap: 10px; margin-bottom: 1rem;">
-                <input type="text" id="guest-input" maxlength="100" placeholder="Enter transmission..." style="flex-grow: 1; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-blue); color: white; padding: 10px; border-radius: 4px; font-family: monospace;">
+                <input type="text" id="guest-input" maxlength="100" placeholder="Enter transmission..." autocomplete="off" style="flex-grow: 1; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-blue); color: white; padding: 12px; border-radius: 6px; font-family: monospace;">
                 <button id="guest-submit" class="btn-neon" style="border-color: var(--neon-blue); color: var(--neon-blue);">SEND</button>
             </div>
 
-            <div id="guest-messages" style="max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.85rem; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 4px; border: 1px solid rgba(59, 130, 246, 0.2);">
+            <div id="guest-messages" style="max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.85rem; padding: 10px; background: rgba(0,0,0,0.4); border-radius: 6px; border: 1px solid rgba(59, 130, 246, 0.2);">
                 <p class="loading" style="color: var(--neon-blue);">Scanning for traces...</p>
             </div>
         </div>
-        </main>
 
         <footer>
             [ END OF LOG // SYSTEM ONLINE ]
@@ -43,27 +51,30 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        // Notice the updated imports here for the guestbook (addDoc, serverTimestamp, limit)
+        import { getFirestore, collection, query, orderBy, getDocs, addDoc, serverTimestamp, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // ==========================================
         // 1. PASTE YOUR FIREBASE CONFIG HERE
         // ==========================================
         const firebaseConfig = {
-  apiKey: "AIzaSyB1d_gCT36RxrQcMQ2Dn7mbdszw4Z9XMQg",
-  authDomain: "teodevblog.firebaseapp.com",
-  projectId: "teodevblog",
-  storageBucket: "teodevblog.firebasestorage.app",
-  messagingSenderId: "209802069985",
-  appId: "1:209802069985:web:9382e0f47c210373f074a0",
-  measurementId: "G-JKE237HSTE"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "your-project.firebaseapp.com",
+            projectId: "your-project",
+            storageBucket: "your-project.appspot.com",
+            messagingSenderId: "123456",
+            appId: "1:123456:web:abcdef"
         };
 
-        // Initialize Firebase Services
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        
         const feedContainer = document.getElementById('main-feed');
+        const publicLogSection = document.getElementById('public-log-section');
 
-        // --- BLOG DATA LOGIC ---
+        // ==========================================
+        // BLOG DATA LOGIC
+        // ==========================================
         async function loadFeed() {
             try {
                 const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
@@ -74,13 +85,12 @@
                     return;
                 }
 
-                feedContainer.innerHTML = ''; // Clear loading screen
+                feedContainer.innerHTML = ''; 
 
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     const postDate = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString() : "PENDING";
                     
-                    // Create Snippet (strips HTML tags for the preview)
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = data.content;
                     const snippet = tempDiv.textContent.substring(0, 140) + "...";
@@ -106,9 +116,11 @@
             }
         }
 
-        // --- DISPLAY LOGIC ---
         function openFullPost(data) {
             window.scrollTo({top: 0, behavior: 'smooth'});
+            // Hide the guestbook when reading a full post to keep the screen clean
+            publicLogSection.style.display = 'none'; 
+            
             feedContainer.innerHTML = `
                 <div class="glass-panel full-post-view">
                     <button class="back-btn" onclick="location.reload()">[ EXIT_LOG ]</button>
@@ -120,20 +132,76 @@
                             <button class="btn-neon" onclick="this.classList.toggle('active-like')">
                                 <span>♥</span> LIKE_POST
                             </button>
-                            <button class="btn-neon" onclick="document.getElementById('comment-box').classList.toggle('hidden')">
+                            <button class="btn-neon" onclick="alert('Comment transmission offline. Use the Public Log on the main page.')">
                                 <span>💬</span> ADD_COMMENT
                             </button>
-                        </div>
-                        <div id="comment-box" class="hidden">
-                            <textarea id="comment-input" placeholder="Enter encrypted transmission..."></textarea>
-                            <button class="btn-neon" style="width:100%" onclick="alert('Comment transmission protocol in development.')">SEND_DATA</button>
                         </div>
                     </div>
                 </div>
             `;
         }
 
+        // ==========================================
+        // PUBLIC LOG (GUESTBOOK) LOGIC
+        // ==========================================
+        const guestInput = document.getElementById('guest-input');
+        const guestSubmit = document.getElementById('guest-submit');
+        const guestMessages = document.getElementById('guest-messages');
+
+        async function loadGuestbook() {
+            try {
+                const q = query(collection(db, "guestbook"), orderBy("timestamp", "desc"), limit(15));
+                const snapshot = await getDocs(q);
+                
+                guestMessages.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    guestMessages.innerHTML = '<span style="color:var(--text-muted)">No traces found. Be the first.</span>';
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const safeText = document.createElement('span');
+                    safeText.textContent = data.message;
+                    
+                    const msgDiv = document.createElement('div');
+                    msgDiv.style.marginBottom = "8px";
+                    msgDiv.style.borderBottom = "1px solid rgba(59, 130, 246, 0.2)";
+                    msgDiv.style.paddingBottom = "4px";
+                    msgDiv.innerHTML = `<span style="color: var(--neon-blue); font-weight: bold;">> ANON:</span> <span style="color: var(--text-main);">${safeText.innerHTML}</span>`;
+                    
+                    guestMessages.appendChild(msgDiv);
+                });
+            } catch (err) {
+                console.error(err);
+                guestMessages.innerHTML = '<span style="color:#ef4444">Failed to load system traces.</span>';
+            }
+        }
+
+        guestSubmit.onclick = async () => {
+            const text = guestInput.value.trim();
+            if (!text) return; 
+            
+            guestSubmit.innerText = "...";
+            try {
+                await addDoc(collection(db, "guestbook"), {
+                    message: text,
+                    timestamp: serverTimestamp()
+                });
+                
+                guestInput.value = ''; 
+                loadGuestbook(); 
+            } catch (e) {
+                console.error(e);
+                alert("Transmission failed. Database locked.");
+            }
+            guestSubmit.innerText = "SEND";
+        };
+
+        // Boot up both systems
         loadFeed();
+        loadGuestbook();
     </script>
 </body>
 </html>
