@@ -1,0 +1,31 @@
+:root {
+    --bg-main: #020617;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+    --neon-purple: #a855f7;
+    --panel-bg: rgba(15, 23, 42, 0.8);
+    --panel-border: rgba(168, 85, 247, 0.2);
+}
+
+body { background-color: var(--bg-main); color: var(--text-main); font-family: system-ui, sans-serif; margin: 0; overflow-x: hidden; }
+
+.bg-glow { position: fixed; border-radius: 50%; filter: blur(120px); z-index: -1; }
+.glow-purple { top: -10%; left: -10%; width: 40vw; height: 40vh; background: rgba(88, 28, 135, 0.4); }
+.glow-blue { bottom: 10%; right: 10%; width: 30vw; height: 30vh; background: rgba(30, 58, 138, 0.3); }
+
+.container { max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem; }
+
+.neon-text { font-size: 3.5rem; font-weight: 900; font-style: italic; color: white; text-shadow: 0 0 10px var(--neon-purple); margin: 0; }
+.subtitle { color: var(--neon-purple); font-family: monospace; font-size: 0.8rem; letter-spacing: 0.1em; }
+
+.layout-grid { display: grid; grid-template-columns: 1fr 3fr; gap: 2rem; margin-top: 2rem; }
+@media (max-width: 768px) { .layout-grid { grid-template-columns: 1fr; } }
+
+.menu-btn { display: block; width: 100%; text-align: left; background: transparent; border: none; color: var(--text-muted); font-family: monospace; padding: 0.5rem; cursor: pointer; }
+.menu-btn:hover { color: var(--neon-purple); background: rgba(168, 85, 247, 0.1); }
+
+.glass-panel { background: var(--panel-bg); backdrop-filter: blur(12px); border: 1px solid var(--panel-border); border-radius: 1rem; padding: 2rem; }
+
+.interaction-zone { margin-top: 2rem; border-top: 1px solid var(--panel-border); padding-top: 1rem; }
+.hidden { display: none; }
+textarea { width: 100%; background: #000; color: #fff; border: 1px solid var(--panel-border); border-radius: 0.5rem; padding: 1rem; margin-top: 1rem; }
