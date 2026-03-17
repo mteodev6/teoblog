@@ -8,8 +8,14 @@
 </head>
 <body>
 
+    <div class="user-profile" id="auth-status">
+        <span id="user-name">GUEST_USER</span>
+        <div class="profile-pic">
+            <img id="user-img" src="https://api.dicebear.com/7.x/bottts/svg?seed=Teo" alt="Profile">
+        </div>
+    </div>
+
     <div class="bg-glow glow-purple"></div>
-    <div class="bg-glow glow-blue"></div>
 
     <div class="container">
         <header>
@@ -19,90 +25,90 @@
 
         <main id="main-feed">
             <div id="loading-state" class="glass-panel">
-                <p class="loading">Scanning database for active logs...</p>
+                <p class="loading">Scanning database...</p>
             </div>
         </main>
-
-        <footer style="margin-top: 4rem; text-align: center; opacity: 0.3; font-family: monospace; font-size: 0.7rem;">
-            [ END OF LOG // SYSTEM ONLINE ]
-        </footer>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        // Auth import for later
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
-        // 1. PASTE YOUR REAL FIREBASE CONFIG HERE
         const firebaseConfig = {
   apiKey: "AIzaSyB1d_gCT36RxrQcMQ2Dn7mbdszw4Z9XMQg",
   authDomain: "teodevblog.firebaseapp.com",
   projectId: "teodevblog",
   storageBucket: "teodevblog.firebasestorage.app",
   messagingSenderId: "209802069985",
-  appId: "1:209802069985:web:9382e0f47c210373f074a0"
+  appId: "1:209802069985:web:9382e0f47c210373f074a0",
+  measurementId: "G-JKE237HSTE"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
         const feedContainer = document.getElementById('main-feed');
 
-        // 2. Load the Feed
+        // Handle Auth UI Update
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('user-name').innerText = user.displayName || "ADMIN";
+                if (user.photoURL) document.getElementById('user-img').src = user.photoURL;
+            }
+        });
+
         async function loadFeed() {
             try {
                 const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
                 const querySnapshot = await getDocs(q);
-                
-                if (querySnapshot.empty) {
-                    feedContainer.innerHTML = '<div class="glass-panel"><h1>Archive Empty</h1><p>No data found.</p></div>';
-                    return;
-                }
-
-                feedContainer.innerHTML = ''; // Clear loading state
+                feedContainer.innerHTML = '';
 
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
-                    const postDate = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString() : "Pending...";
-                    
-                    // Create the Post Card
                     const card = document.createElement('div');
                     card.className = "glass-panel post-card";
                     
-                    // Create a text snippet (removes HTML tags first)
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = data.content;
-                    const snippet = tempDiv.textContent.substring(0, 150) + "...";
+                    const snippet = tempDiv.textContent.substring(0, 120) + "...";
 
                     card.innerHTML = `
                         <div class="post-header">
                             <h2 class="post-title">> ${data.title}</h2>
-                            <span class="post-date">${postDate}</span>
                         </div>
                         <p class="post-snippet">${snippet}</p>
-                        <button class="read-more">OPEN_LOG</button>
+                        <button class="read-more">DECRYPT_LOG</button>
                     `;
 
-                    // Click event to expand
                     card.onclick = () => openFullPost(data);
                     feedContainer.appendChild(card);
                 });
-
-            } catch (err) {
-                console.error(err);
-                feedContainer.innerHTML = '<div class="glass-panel"><p class="error">CRITICAL_ERROR: Database link severed.</p></div>';
-            }
+            } catch (err) { console.error(err); }
         }
 
-        // 3. Open Full Post View
         function openFullPost(data) {
             window.scrollTo({top: 0, behavior: 'smooth'});
             feedContainer.innerHTML = `
                 <div class="glass-panel full-post-view">
-                    <button class="back-btn" onclick="location.reload()">[ BACK_TO_ARCHIVE ]</button>
+                    <button class="back-btn" onclick="location.reload()">[ EXIT_LOG ]</button>
                     <h1 class="neon-text-small">${data.title}</h1>
                     <div class="full-content">${data.content}</div>
+                    
                     <div class="interaction-zone">
-                        <button class="action-btn active-like">♥ Like</button>
-                        <button class="action-btn">💬 Comment</button>
+                        <div class="actions">
+                            <button class="btn-neon" onclick="this.classList.toggle('active-like')">
+                                <span>♥</span> LIKE_POST
+                            </button>
+                            <button class="btn-neon" onclick="document.getElementById('comment-box').classList.toggle('hidden')">
+                                <span>💬</span> ADD_COMMENT
+                            </button>
+                        </div>
+                        <div id="comment-box" class="hidden">
+                            <textarea id="comment-input" placeholder="Enter transmission..."></textarea>
+                            <button class="btn-neon" style="width:100%">SEND_DATA</button>
+                        </div>
                     </div>
                 </div>
             `;
